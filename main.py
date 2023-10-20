@@ -14,7 +14,7 @@ with open('config.json', 'r') as file:
     config = json.load(file)
 
 intents = discord.Intents.default()
-intents.message_content = True
+intents.messages = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
