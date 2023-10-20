@@ -5,6 +5,7 @@ from discord.voice_client import VoiceClient
 import asyncio
 import os
 import random
+from dotenv import load_dotenv
 
 channel_id = 1082305144143740958
 MUSIC_DIR = 'pisnyary'
@@ -158,4 +159,6 @@ async def play_audio(ctx, filename):
     await vc.disconnect()
 
 
-bot.run(config['token'], reconnect=True)
+load_dotenv()
+token = os.environ.get('TOKEN')
+bot.run(token=token, reconnect=True)
