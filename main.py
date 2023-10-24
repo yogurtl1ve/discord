@@ -50,12 +50,25 @@ async def play(ctx):
 
     for song in playlist:
         track_name = os.path.splitext(os.path.basename(song))[0]
-        audio = discord.FFmpegPCMAudio(song)
-        audio = discord.PCMVolumeTransformer(audio, volume=0.5)
-        voice.play(audio)
-        await ctx.send(f"Играет {track_name}")
-        while voice.is_playing():
-            await asyncio.sleep(1)
+        # Попробуем воспроизвести песню до 3 раз
+        for i in range(3):
+            try:
+                audio = discord.FFmpegPCMAudio(song)
+                audio = discord.PCMVolumeTransformer(audio, volume=0.5)
+                voice.play(audio)
+                await ctx.send(f"Играет {track_name}")
+                while voice.is_playing():
+                    await asyncio.sleep(1)
+                break
+            except Exception as e:
+                # Если произошла ошибка, попробуем снова
+                print(e)
+                continue
+
+        # Если песня не была воспроизведена после 3 попыток, переходим к следующей песне
+        else:
+            print(f"Не удалось воспроизвести песню {track_name}")
+            continue
 
 @bot.command(name='filatov')
 async def play_filatov(ctx):
