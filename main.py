@@ -1,7 +1,5 @@
-import json
 import discord
 from discord.ext import commands
-from discord.voice_client import VoiceClient
 import asyncio
 import os
 import random
@@ -10,9 +8,6 @@ from dotenv import load_dotenv
 channel_id = 1082305144143740958
 MUSIC_DIR = 'pisnyary'
 FILATOV_DIR = 'filatov'
-
-with open('config.json', 'r') as file:
-    config = json.load(file)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -32,6 +27,7 @@ def create_playlist(directory):
 async def play(ctx):
     if ctx.channel.id != channel_id:
         return
+
     voice_channel = ctx.author.voice.channel
     if not voice_channel:
         await ctx.send("Вы не находитесь в голосовом канале!")
@@ -41,19 +37,21 @@ async def play(ctx):
     playlist = create_playlist(MUSIC_DIR)
     random.shuffle(playlist)
 
-    try:
-        voice = await voice_channel.connect()
-    except discord.errors.ClientException:
-        voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+    voice = await voice_channel.connect()
+    # или
+    # voice = discord.utils.get(bot.voice_clients, guild=ctx.guild)
+
     if voice.is_playing():
         voice.stop()
+
     if not playlist:
         await ctx.send("Плейлист пуст!")
         return
+
     for song in playlist:
         track_name = os.path.splitext(os.path.basename(song))[0]
         audio = discord.FFmpegPCMAudio(song)
-        audio = discord.PCMVolumeTransformer( audio, volume=0.5)
+        audio = discord.PCMVolumeTransformer(audio, volume=0.5)
         voice.play(audio)
         await ctx.send(f"Играет {track_name}")
         while voice.is_playing():
